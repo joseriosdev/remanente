@@ -1,63 +1,65 @@
-# Heading 1 (#)
-## Heading 2 (#*2)
-### Heading 3 (#*3)
-#### Heading 4 (#*4)
-##### Heading 5 (#*5)
-###### Heading 6 (#*6)
+# 📚 Interactive English Course Player
 
----
-___
+A lightweight, **zero-dependency** web application designed for English teachers to deliver structured lessons offline. This tool allows students to navigate through modules, lessons, and sentences with built-in pronunciation support, all within a single file.
 
-### Strong text
-double _ or * will help you to bold the text __just like this__
+## 🚀 Key Features
 
-### Italic text
-single _ or * will help you to italic the text *just like this*
-
-### Comments 
-comments are the same way than in html
-(_*3 or -*3 it's equal to the horizontal rule)
-
-___
-
-unordered lists starts with a single *
-
-oredered lists starts with *__1.__* and the 2nd, 3rd, 4th ... are always **_1._**
+* **100% Offline Capability:** Works without an internet connection. Perfect for students with limited connectivity.
+* **Integrated Audio:** Uses the browser's native Web Speech API for instant English pronunciation (no external MP3 files needed).
+* **Progressive Unlocking:** Students must complete sentences in order to unlock subsequent lessons and modules.
+* **Persistent Progress:** Saves student progress automatically using the browser's local storage.
+* **Adaptive UI:** Includes a Dark/Light mode toggle and a responsive design for different screen sizes.
+* **Zero Setup:** No installation or local server required. Just open `index.html` in any modern browser.
 
 ---
 
-~~line throuhg~~ with the ~ symbol, two at the start and to at the end
+## 🛠 How to Customize Your Content
 
-> "quote something with the (**>**) symbol"
+The entire course structure is managed within a single JavaScript object at the bottom of the HTML file.
 
-\```javascript  <- that is the start of a code block in js, the end is the same but without javascript, change the langauge to change the coloring
-
-
+To add your own sentences, locate the `COURSE_DATA` constant in the `<script>` section:
 
 ```javascript
-
-// Javascript type of variables scopes
-var val = null;
-let num = 5;
-const str = 'hi';
+const COURSE_DATA = [
+    {
+        id: 1,
+        title: "Module 1: Professional Life",
+        topics: ["Job Interviews", "Writing Emails"],
+        lessons: [
+            {
+                id: 1,
+                title: "Lesson 1: Introductions",
+                resources: ["PDF: Interview Tips", "Image: Body Language"],
+                sentences: [
+                    { 
+                        en: "I have four years of experience in this field.", 
+                        es: "Tengo cuatro años de experiencia en este campo.", 
+                        ph: "ai hav for yirz ov ik-spier-ee-uhns..." 
+                    },
+                    // Add more sentences here
+                ]
+            }
+        ]
+    }
+];
 
 ```
 
+### Data Fields:
 
-```python
+| Field | Description |
+| --- | --- |
+| `en` | The sentence in English (This is what the audio will read). |
+| `es` | The Spanish translation shown below the sentence. |
+| `ph` | Phonetic guide or pronunciation notes for the student. |
 
-# Comments are different here, below is a function
-def functionName():
-	print('oi galera')
+---
 
-```
+## 🎮 Navigation Controls
 
-[link](www.google.com "link to google")
-![img](https://www.w3schools.com/images/colorpicker.gif "title of the img link")
-
-
-```bash
-
-[link](www.google.com "link to google")
-![img](https://www.w3schools.com/images/colorpicker.gif "title of the img link")
-```
+| Action | Result |
+| --- | --- |
+| **Click / Down Arrow** | Reveal next sentence / Highlight next. |
+| **Up Arrow** | Go back to the previous sentence. |
+| **Enter / Spacebar** | Play audio pronunciation. |
+| **Back Arrow** | Return to the previous menu (Modules or Lessons). |

@@ -1,26 +1,27 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="icon" type="image/x-icon" href="https://cdn-icons-png.flaticon.com/512/5309/5309804.png">
+	<link rel="icon" type="image/x-icon" href="https://cdn-icons-png.flaticon.com/512/1377/1377975.png">
     <title>English Course - Interactive Learning</title>
     <style>
         :root {
-            --bg-color: whitesmoke;
+            --bg-color: #f4f7f6;
             --text-color: #333;
-            --card-bg: white;
-            --primary-color: steelblue;
+            --card-bg: #ffffff;
+            --primary-color: #3498db;
             --secondary-color: #2ecc71;
             --highlight-color: #f1c40f;
             --gray-out: #bdc3c7;
             --accent-color: #e74c3c;
+            --danger-color: #e74c3c;
             --border-radius: 12px;
             --transition: all 0.3s ease;
         }
 
         [data-theme="dark"] {
-            --bg-color: #1f1f1f;
+            --bg-color: #1a1a1a;
             --text-color: #ecf0f1;
             --card-bg: #2c3e50;
             --primary-color: #2980b9;
@@ -45,6 +46,13 @@
             align-items: center;
             background: var(--card-bg);
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
         }
 
         .container {
@@ -57,21 +65,21 @@
 
         .hidden { display: none !important; }
 
-        /* UI Elements */
         .btn {
-            padding: 10px 20px;
+            padding: 10px 18px;
             border: none;
             border-radius: var(--border-radius);
             cursor: pointer;
             font-weight: 600;
             transition: var(--transition);
-            margin: 5px;
         }
 
         .btn-primary { background: var(--primary-color); color: white; }
         .btn-secondary { background: var(--secondary-color); color: white; }
         .btn-outline { border: 2px solid var(--primary-color); background: transparent; color: var(--primary-color); }
-        .btn:disabled { background: var(--gray-out); cursor: not-allowed; }
+        .btn-danger { border: 2px solid var(--danger-color); background: transparent; color: var(--danger-color); font-size: 0.8rem; }
+        .btn-danger:hover { background: var(--danger-color); color: white; }
+        .btn:disabled { background: var(--gray-out); cursor: not-allowed; border-color: var(--gray-out); color: white; }
 
         .card {
             background: var(--card-bg);
@@ -92,10 +100,9 @@
             font-size: 0.9rem;
         }
 
-        /* Sentence Area */
         #sentences-view {
             text-align: center;
-            height: 70vh;
+            min-height: 60vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -112,7 +119,7 @@
         .sentence-item.highlight {
             opacity: 1;
             color: var(--primary-color);
-            transform: scale(1.1);
+            transform: scale(1.05);
             font-weight: bold;
         }
 
@@ -121,21 +128,9 @@
             color: var(--gray-out);
         }
 
-        .translation {
-            display: block;
-            font-size: 1rem;
-            color: var(--secondary-color);
-            margin-top: 5px;
-        }
+        .translation { display: block; font-size: 1rem; color: var(--secondary-color); margin-top: 5px; }
+        .pronunciation { display: block; font-size: 0.9rem; font-style: italic; color: var(--accent-color); }
 
-        .pronunciation {
-            display: block;
-            font-size: 0.9rem;
-            font-style: italic;
-            color: var(--accent-color);
-        }
-
-        /* Modal */
         #modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -151,8 +146,11 @@
 
     <header>
         <button id="back-btn" class="btn btn-outline">← Back</button>
-        <h2 id="view-title">Modules</h2>
-        <button id="theme-toggle" class="btn btn-outline">🌓 Theme</button>
+        <h2 id="view-title" style="margin: 0; flex-grow: 1; text-align: center;">Modules</h2>
+        <div class="header-actions">
+            <button id="reset-btn" class="btn btn-danger" title="Restart all progress">Reset</button>
+            <button id="theme-toggle" class="btn btn-outline">🌓</button>
+        </div>
     </header>
 
     <div class="container">
@@ -163,88 +161,79 @@
 
     <div id="modal-overlay" class="hidden">
         <div class="card" style="max-width: 400px; text-align: center;">
-            <h3>How to Interact</h3>
+            <h3>Ready?</h3>
             <p>🖱️ <b>Click</b> or ⬇️ <b>Down Arrow</b>: Next Sentence</p>
             <p>⬆️ <b>Up Arrow</b>: Previous Sentence</p>
-            <p>⌨️ <b>Enter/Space</b>: Play Pronunciation</p>
-            <button class="btn btn-primary" onclick="closeModal()">Got it!</button>
+            <p>⌨️ <b>Enter/Space</b>: Hear Audio</p>
+            <button class="btn btn-primary" onclick="closeModal()">Start Lesson</button>
         </div>
     </div>
 
     <script>
-        /*************************************************
-         * 1. THE DATA OBJECT (Edit this to add content)
-         *************************************************/
+        /**
+         * COURSE CONTENT
+         */
         const COURSE_DATA = [
             {
                 id: 1,
-                title: "Module 1: Basics",
-                topics: ["Present Simple", "Greetings", "Personal Pronouns"],
+                title: "Module 1: Greetings",
+                topics: ["Introduction", "Formal Greetings", "Informal Slang"],
                 lessons: [
                     {
                         id: 1,
-                        title: "Lesson 1: Greetings",
-                        resources: ["Link: Greetings Video", "Image: Hello Chart"],
+                        title: "Lesson 1: The Basics",
+                        resources: ["PDF: Useful Phrases", "Link: Audio Practice"],
                         sentences: [
-                            { en: "Hello, how are you?", es: "¿Hola, cómo estás?", ph: "hel-oh, how ar yoo?" },
-                            { en: "I am fine, thank you.", es: "Estoy bien, gracias.", ph: "ai am fain, thank yoo." },
-                            { en: "Nice to meet you.", es: "Gusto en conocerte.", ph: "nais too meet yoo." }
-                        ]
-                    },
-                    {
-                        id: 2,
-                        title: "Lesson 2: Personal Info",
-                        resources: ["Resource A", "Resource B"],
-                        sentences: [
-                            { en: "My name is John.", es: "Mi nombre es John.", ph: "mai neim is jon." }
+                            { en: "Good morning, how can I help you?", es: "Buen día, ¿cómo puedo ayudarle?", ph: "gud mor-ning, hau kan ai help yoo?" },
+                            { en: "It is a pleasure to meet you.", es: "Es un placer conocerte.", ph: "it iz ei ple-shur too meet yoo." }
                         ]
                     }
-                    // Add up to 7 lessons...
                 ]
             },
             {
                 id: 2,
                 title: "Module 2: Daily Life",
-                topics: ["Routine", "Time", "Jobs"],
+                topics: ["Work routine", "Shopping", "Food"],
                 lessons: [
-                    { id: 1, title: "Lesson 1: Time", resources: [], sentences: [{ en: "What time is it?", es: "¿Qué hora es?", ph: "wot taim is it?" }] }
+                    {
+                        id: 1,
+                        title: "Lesson 1: Food",
+                        resources: [],
+                        sentences: [
+                            { en: "I would like a coffee, please.", es: "Quisiera un café, por favor.", ph: "ai wud laik ei ko-fi pliz." }
+                        ]
+                    }
                 ]
             }
-            // Add up to 7 modules...
         ];
 
-        /*************************************************
-         * 2. STATE MANAGEMENT
-         *************************************************/
+        /**
+         * STATE & STORAGE
+         */
         let currentView = 'modules';
         let currentModuleIndex = null;
         let currentLessonIndex = null;
         let currentSentenceIndex = -1;
         
-        // Progression Tracking (Persists in browser)
-        let progress = JSON.parse(localStorage.getItem('eng_course_progress')) || {
-            maxModule: 0,
-            maxLesson: 0
-        };
+        let progress = JSON.parse(localStorage.getItem('eng_course_progress')) || { maxModule: 0, maxLesson: 0 };
 
-        /*************************************************
-         * 3. CORE LOGIC
-         *************************************************/
         const modulesView = document.getElementById('modules-view');
         const lessonsView = document.getElementById('lessons-view');
         const sentencesView = document.getElementById('sentences-view');
         const viewTitle = document.getElementById('view-title');
         const backBtn = document.getElementById('back-btn');
+        const resetBtn = document.getElementById('reset-btn');
 
         function init() {
             renderModules();
             setupTheme();
         }
 
-        // --- View Navigation ---
+        // --- View Logic ---
         function renderModules() {
             currentView = 'modules';
-            viewTitle.innerText = "Course Modules";
+            //viewTitle.innerHTML = '<span style="font-family:Tahoma,sans-serif">REMANEN<span style="color:red;font-size:20pt">T</span>E</span><br>Curso de Inglés';
+			viewTitle.innerHTML = 'Curso de Inglés<br><img src="./remanente.png" alt="remanente" width="130px" height="30px">';
             backBtn.classList.add('hidden');
             modulesView.innerHTML = '';
             lessonsView.classList.add('hidden');
@@ -257,8 +246,10 @@
                 div.className = 'card';
                 div.innerHTML = `
                     <h3>${mod.title} ${isLocked ? '🔒' : ''}</h3>
-                    <button class="btn btn-outline" onclick="toggleList('mod-topics-${index}')">View Topics</button>
-                    <button class="btn btn-primary" ${isLocked ? 'disabled' : ''} onclick="goToLessons(${index})">Open Lessons</button>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn btn-outline" onclick="toggleList('mod-topics-${index}')">Topics</button>
+                        <button class="btn btn-primary" ${isLocked ? 'disabled' : ''} onclick="goToLessons(${index})">Enter Module</button>
+                    </div>
                     <div id="mod-topics-${index}" class="list-toggle hidden">
                         <ul>${mod.topics.map(t => `<li>${t}</li>`).join('')}</ul>
                     </div>
@@ -282,10 +273,12 @@
                 div.className = 'card';
                 div.innerHTML = `
                     <h4>${less.title} ${isLocked ? '🔒' : ''}</h4>
-                    <button class="btn btn-outline" onclick="toggleList('less-res-${lIndex}')">Resources</button>
-                    <button class="btn btn-secondary" ${isLocked ? 'disabled' : ''} onclick="startSentences(${lIndex})">Start Practice</button>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn btn-outline" onclick="toggleList('less-res-${lIndex}')">Resources</button>
+                        <button class="btn btn-secondary" ${isLocked ? 'disabled' : ''} onclick="startSentences(${lIndex})">Practice</button>
+                    </div>
                     <div id="less-res-${lIndex}" class="list-toggle hidden">
-                        <ul>${less.resources.map(r => `<li>${r}</li>`).join('') || 'No resources'}</ul>
+                        <ul>${less.resources.map(r => `<li>${r}</li>`).join('') || 'No extra resources'}</ul>
                     </div>
                 `;
                 lessonsView.appendChild(div);
@@ -300,15 +293,12 @@
             sentencesView.classList.remove('hidden');
             viewTitle.innerText = COURSE_DATA[currentModuleIndex].lessons[lessIndex].title;
             sentencesView.innerHTML = '';
-            
             document.getElementById('modal-overlay').classList.remove('hidden');
         }
 
-        // --- Sentence System ---
         function updateSentences() {
             const sentences = COURSE_DATA[currentModuleIndex].lessons[currentLessonIndex].sentences;
             sentencesView.innerHTML = '';
-            
             sentences.forEach((s, i) => {
                 if (i <= currentSentenceIndex) {
                     const div = document.createElement('div');
@@ -321,11 +311,7 @@
                     sentencesView.appendChild(div);
                 }
             });
-
-            // Handle progress unlocking
-            if (currentSentenceIndex === sentences.length - 1) {
-                unlockNext();
-            }
+            if (currentSentenceIndex === sentences.length - 1) unlockNext();
         }
 
         function unlockNext() {
@@ -341,6 +327,15 @@
             }
         }
 
+        function resetProgress() {
+            if (confirm("¿Estás seguro/a de querer reiniciar TODO el progreso? Esta acción no se puede reversar.")) {
+                localStorage.removeItem('eng_course_progress');
+                progress = { maxModule: 0, maxLesson: 0 };
+                renderModules();
+            }
+        }
+
+        // --- Audio & Navigation ---
         function nextSentence() {
             const sentences = COURSE_DATA[currentModuleIndex].lessons[currentLessonIndex].sentences;
             if (currentSentenceIndex < sentences.length - 1) {
@@ -361,25 +356,24 @@
             const text = COURSE_DATA[currentModuleIndex].lessons[currentLessonIndex].sentences[currentSentenceIndex].en;
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'en-US';
-            utterance.rate = 0.9;
+            utterance.rate = 0.85;
+            window.speechSynthesis.cancel(); // Stop current speech
             window.speechSynthesis.speak(utterance);
         }
 
-        // --- Helpers ---
-        function toggleList(id) {
-            document.getElementById(id).classList.toggle('hidden');
-        }
-
-        function closeModal() {
-            document.getElementById('modal-overlay').classList.add('hidden');
-        }
+        function toggleList(id) { document.getElementById(id).classList.toggle('hidden'); }
+        function closeModal() { document.getElementById('modal-overlay').classList.add('hidden'); }
 
         backBtn.onclick = () => {
             if (currentView === 'lessons') renderModules();
             else if (currentView === 'sentences') goToLessons(currentModuleIndex);
         };
 
-        // --- Theme ---
+        resetBtn.onclick = (e) => {
+            e.stopPropagation();
+            resetProgress();
+        };
+
         function setupTheme() {
             const themeToggle = document.getElementById('theme-toggle');
             themeToggle.onclick = () => {
@@ -388,9 +382,8 @@
             };
         }
 
-        // --- Event Listeners ---
         window.onclick = (e) => {
-            if (currentView === 'sentences' && !document.getElementById('modal-overlay').contains(e.target)) {
+            if (currentView === 'sentences' && !document.getElementById('modal-overlay').contains(e.target) && !e.target.closest('header')) {
                 nextSentence();
             }
         };
