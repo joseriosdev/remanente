@@ -1,7 +1,0 @@
-{
-  "type" : "Fighting",
-  "description" : "Fighting Pokémon are strong and muscle-bound, often based on martial artists.",
-  "strengths" : "Normal, Rock, Steel, Ice, Dark",
-  "weakness" : "Flying, Poison, Psychic, Bug, Ghost, Fairy",
-  "example" : "Lucario"
-}

@@ -1,27 +1,411 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="icon" type="image/x-icon" href="https://cdn-icons-png.flaticon.com/512/5309/5309804.png">
+    <title>English Course - Interactive Learning</title>
+    <style>
+        :root {
+            --bg-color: whitesmoke;
+            --text-color: #333;
+            --card-bg: white;
+            --primary-color: steelblue;
+            --secondary-color: #2ecc71;
+            --highlight-color: #f1c40f;
+            --gray-out: #bdc3c7;
+            --accent-color: #e74c3c;
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
 
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+        [data-theme="dark"] {
+            --bg-color: #1f1f1f;
+            --text-color: #ecf0f1;
+            --card-bg: #2c3e50;
+            --primary-color: #2980b9;
+            --gray-out: #7f8c8d;
+        }
 
-    <title>Hello, world!</title>
-  </head>
-  <body>
-    <h1 class="bg-secondary">Hello, world!</h1>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
 
-    <!-- Optional JavaScript; choose one of the two! -->
+        header {
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
 
-    <!-- Option 1: Bootstrap Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            flex-grow: 1;
+            width: 100%;
+        }
 
-    <!-- Option 2: Separate Popper and Bootstrap JS -->
-    <!--
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.6.0/dist/umd/popper.min.js" integrity="sha384-KsvD1yqQ1/1+IA7gi3P0tyJcT3vR+NdBTt13hSJ2lnve8agRGXTTyNaBYmCR/Nwi" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.min.js" integrity="sha384-nsg8ua9HAw1y0W1btsyWgBklPnCUAFLuTMS2G72MMONqmOymq585AcH49TLBQObG" crossorigin="anonymous"></script>
-    -->
-  </body>
+        .hidden { display: none !important; }
+
+        /* UI Elements */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            margin: 5px;
+        }
+
+        .btn-primary { background: var(--primary-color); color: white; }
+        .btn-secondary { background: var(--secondary-color); color: white; }
+        .btn-outline { border: 2px solid var(--primary-color); background: transparent; color: var(--primary-color); }
+        .btn:disabled { background: var(--gray-out); cursor: not-allowed; }
+
+        .card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .list-toggle {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        /* Sentence Area */
+        #sentences-view {
+            text-align: center;
+            height: 70vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .sentence-item {
+            font-size: 1.8rem;
+            margin: 1.5rem 0;
+            opacity: 0.3;
+            transition: var(--transition);
+        }
+
+        .sentence-item.highlight {
+            opacity: 1;
+            color: var(--primary-color);
+            transform: scale(1.1);
+            font-weight: bold;
+        }
+
+        .sentence-item.visited {
+            opacity: 0.5;
+            color: var(--gray-out);
+        }
+
+        .translation {
+            display: block;
+            font-size: 1rem;
+            color: var(--secondary-color);
+            margin-top: 5px;
+        }
+
+        .pronunciation {
+            display: block;
+            font-size: 0.9rem;
+            font-style: italic;
+            color: var(--accent-color);
+        }
+
+        /* Modal */
+        #modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <button id="back-btn" class="btn btn-outline">← Back</button>
+        <h2 id="view-title">Modules</h2>
+        <button id="theme-toggle" class="btn btn-outline">🌓 Theme</button>
+    </header>
+
+    <div class="container">
+        <div id="modules-view"></div>
+        <div id="lessons-view" class="hidden"></div>
+        <div id="sentences-view" class="hidden"></div>
+    </div>
+
+    <div id="modal-overlay" class="hidden">
+        <div class="card" style="max-width: 400px; text-align: center;">
+            <h3>How to Interact</h3>
+            <p>🖱️ <b>Click</b> or ⬇️ <b>Down Arrow</b>: Next Sentence</p>
+            <p>⬆️ <b>Up Arrow</b>: Previous Sentence</p>
+            <p>⌨️ <b>Enter/Space</b>: Play Pronunciation</p>
+            <button class="btn btn-primary" onclick="closeModal()">Got it!</button>
+        </div>
+    </div>
+
+    <script>
+        /*************************************************
+         * 1. THE DATA OBJECT (Edit this to add content)
+         *************************************************/
+        const COURSE_DATA = [
+            {
+                id: 1,
+                title: "Module 1: Basics",
+                topics: ["Present Simple", "Greetings", "Personal Pronouns"],
+                lessons: [
+                    {
+                        id: 1,
+                        title: "Lesson 1: Greetings",
+                        resources: ["Link: Greetings Video", "Image: Hello Chart"],
+                        sentences: [
+                            { en: "Hello, how are you?", es: "¿Hola, cómo estás?", ph: "hel-oh, how ar yoo?" },
+                            { en: "I am fine, thank you.", es: "Estoy bien, gracias.", ph: "ai am fain, thank yoo." },
+                            { en: "Nice to meet you.", es: "Gusto en conocerte.", ph: "nais too meet yoo." }
+                        ]
+                    },
+                    {
+                        id: 2,
+                        title: "Lesson 2: Personal Info",
+                        resources: ["Resource A", "Resource B"],
+                        sentences: [
+                            { en: "My name is John.", es: "Mi nombre es John.", ph: "mai neim is jon." }
+                        ]
+                    }
+                    // Add up to 7 lessons...
+                ]
+            },
+            {
+                id: 2,
+                title: "Module 2: Daily Life",
+                topics: ["Routine", "Time", "Jobs"],
+                lessons: [
+                    { id: 1, title: "Lesson 1: Time", resources: [], sentences: [{ en: "What time is it?", es: "¿Qué hora es?", ph: "wot taim is it?" }] }
+                ]
+            }
+            // Add up to 7 modules...
+        ];
+
+        /*************************************************
+         * 2. STATE MANAGEMENT
+         *************************************************/
+        let currentView = 'modules';
+        let currentModuleIndex = null;
+        let currentLessonIndex = null;
+        let currentSentenceIndex = -1;
+        
+        // Progression Tracking (Persists in browser)
+        let progress = JSON.parse(localStorage.getItem('eng_course_progress')) || {
+            maxModule: 0,
+            maxLesson: 0
+        };
+
+        /*************************************************
+         * 3. CORE LOGIC
+         *************************************************/
+        const modulesView = document.getElementById('modules-view');
+        const lessonsView = document.getElementById('lessons-view');
+        const sentencesView = document.getElementById('sentences-view');
+        const viewTitle = document.getElementById('view-title');
+        const backBtn = document.getElementById('back-btn');
+
+        function init() {
+            renderModules();
+            setupTheme();
+        }
+
+        // --- View Navigation ---
+        function renderModules() {
+            currentView = 'modules';
+            viewTitle.innerText = "Course Modules";
+            backBtn.classList.add('hidden');
+            modulesView.innerHTML = '';
+            lessonsView.classList.add('hidden');
+            sentencesView.classList.add('hidden');
+            modulesView.classList.remove('hidden');
+
+            COURSE_DATA.forEach((mod, index) => {
+                const isLocked = index > progress.maxModule;
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.innerHTML = `
+                    <h3>${mod.title} ${isLocked ? '🔒' : ''}</h3>
+                    <button class="btn btn-outline" onclick="toggleList('mod-topics-${index}')">View Topics</button>
+                    <button class="btn btn-primary" ${isLocked ? 'disabled' : ''} onclick="goToLessons(${index})">Open Lessons</button>
+                    <div id="mod-topics-${index}" class="list-toggle hidden">
+                        <ul>${mod.topics.map(t => `<li>${t}</li>`).join('')}</ul>
+                    </div>
+                `;
+                modulesView.appendChild(div);
+            });
+        }
+
+        function goToLessons(modIndex) {
+            currentView = 'lessons';
+            currentModuleIndex = modIndex;
+            viewTitle.innerText = COURSE_DATA[modIndex].title;
+            backBtn.classList.remove('hidden');
+            modulesView.classList.add('hidden');
+            lessonsView.classList.remove('hidden');
+            lessonsView.innerHTML = '';
+
+            COURSE_DATA[modIndex].lessons.forEach((less, lIndex) => {
+                const isLocked = (modIndex === progress.maxModule && lIndex > progress.maxLesson) || (modIndex > progress.maxModule);
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.innerHTML = `
+                    <h4>${less.title} ${isLocked ? '🔒' : ''}</h4>
+                    <button class="btn btn-outline" onclick="toggleList('less-res-${lIndex}')">Resources</button>
+                    <button class="btn btn-secondary" ${isLocked ? 'disabled' : ''} onclick="startSentences(${lIndex})">Start Practice</button>
+                    <div id="less-res-${lIndex}" class="list-toggle hidden">
+                        <ul>${less.resources.map(r => `<li>${r}</li>`).join('') || 'No resources'}</ul>
+                    </div>
+                `;
+                lessonsView.appendChild(div);
+            });
+        }
+
+        function startSentences(lessIndex) {
+            currentView = 'sentences';
+            currentLessonIndex = lessIndex;
+            currentSentenceIndex = -1;
+            lessonsView.classList.add('hidden');
+            sentencesView.classList.remove('hidden');
+            viewTitle.innerText = COURSE_DATA[currentModuleIndex].lessons[lessIndex].title;
+            sentencesView.innerHTML = '';
+            
+            document.getElementById('modal-overlay').classList.remove('hidden');
+        }
+
+        // --- Sentence System ---
+        function updateSentences() {
+            const sentences = COURSE_DATA[currentModuleIndex].lessons[currentLessonIndex].sentences;
+            sentencesView.innerHTML = '';
+            
+            sentences.forEach((s, i) => {
+                if (i <= currentSentenceIndex) {
+                    const div = document.createElement('div');
+                    div.className = `sentence-item ${i === currentSentenceIndex ? 'highlight' : 'visited'}`;
+                    div.innerHTML = `
+                        ${s.en}
+                        <span class="translation">${s.es}</span>
+                        <span class="pronunciation">[ ${s.ph} ]</span>
+                    `;
+                    sentencesView.appendChild(div);
+                }
+            });
+
+            // Handle progress unlocking
+            if (currentSentenceIndex === sentences.length - 1) {
+                unlockNext();
+            }
+        }
+
+        function unlockNext() {
+            const currentMod = COURSE_DATA[currentModuleIndex];
+            if (currentLessonIndex === progress.maxLesson && currentModuleIndex === progress.maxModule) {
+                if (currentLessonIndex < currentMod.lessons.length - 1) {
+                    progress.maxLesson++;
+                } else if (currentModuleIndex < COURSE_DATA.length - 1) {
+                    progress.maxModule++;
+                    progress.maxLesson = 0;
+                }
+                localStorage.setItem('eng_course_progress', JSON.stringify(progress));
+            }
+        }
+
+        function nextSentence() {
+            const sentences = COURSE_DATA[currentModuleIndex].lessons[currentLessonIndex].sentences;
+            if (currentSentenceIndex < sentences.length - 1) {
+                currentSentenceIndex++;
+                updateSentences();
+            }
+        }
+
+        function prevSentence() {
+            if (currentSentenceIndex > 0) {
+                currentSentenceIndex--;
+                updateSentences();
+            }
+        }
+
+        function playPronunciation() {
+            if (currentSentenceIndex === -1) return;
+            const text = COURSE_DATA[currentModuleIndex].lessons[currentLessonIndex].sentences[currentSentenceIndex].en;
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // --- Helpers ---
+        function toggleList(id) {
+            document.getElementById(id).classList.toggle('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modal-overlay').classList.add('hidden');
+        }
+
+        backBtn.onclick = () => {
+            if (currentView === 'lessons') renderModules();
+            else if (currentView === 'sentences') goToLessons(currentModuleIndex);
+        };
+
+        // --- Theme ---
+        function setupTheme() {
+            const themeToggle = document.getElementById('theme-toggle');
+            themeToggle.onclick = () => {
+                const current = document.body.getAttribute('data-theme');
+                document.body.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+            };
+        }
+
+        // --- Event Listeners ---
+        window.onclick = (e) => {
+            if (currentView === 'sentences' && !document.getElementById('modal-overlay').contains(e.target)) {
+                nextSentence();
+            }
+        };
+
+        window.onkeydown = (e) => {
+            if (currentView !== 'sentences') return;
+            if (e.key === 'ArrowDown') nextSentence();
+            if (e.key === 'ArrowUp') prevSentence();
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                playPronunciation();
+            }
+        };
+
+        init();
+    </script>
+</body>
 </html>
