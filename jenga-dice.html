@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+	<link rel="icon" type="image/png" href="https://img.icons8.com/color/1200/dice.jpg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jenga Color Dice</title>
+    <style>
+        :root {
+            --dice-size: 150px;
+            --circle-size: 100px;
+            --bg-color: #2c3e50;
+            --text-color: #ecf0f1;
+            /* Jenga Colors */
+            --color-red: #e74c3c;
+            --color-orange: #e67e22;
+            --color-yellow: #f1c40f;
+            --color-green: #2ecc71;
+            --color-blue: #3498db;
+            --color-pink: #fd79a8;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* 3D Scene */
+        .scene {
+            width: var(--dice-size);
+            height: var(--dice-size);
+            perspective: 600px;
+            margin-bottom: 50px;
+        }
+
+        .cube {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: translateZ(-75px);
+            transition: transform 1.5s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+        }
+
+        .face {
+            position: absolute;
+            width: var(--dice-size);
+            height: var(--dice-size);
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #bdc3c7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .circle {
+            width: var(--circle-size);
+            height: var(--circle-size);
+            border-radius: 50%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        /* Face Rotations */
+        .face-red    { transform: rotateY(0deg) translateZ(75px); }
+        .face-orange { transform: rotateY(90deg) translateZ(75px); }
+        .face-yellow { transform: rotateY(180deg) translateZ(75px); }
+        .face-green  { transform: rotateY(-90deg) translateZ(75px); }
+        .face-blue   { transform: rotateX(90deg) translateZ(75px); }
+        .face-pink   { transform: rotateX(-90deg) translateZ(75px); }
+
+        /* Face Colors */
+        .face-red .circle    { background-color: var(--color-red); }
+        .face-orange .circle { background-color: var(--color-orange); }
+        .face-yellow .circle { background-color: var(--color-yellow); }
+        .face-green .circle  { background-color: var(--color-green); }
+        .face-blue .circle   { background-color: var(--color-blue); }
+        .face-pink .circle   { background-color: var(--color-pink); }
+
+        /* Controls */
+        .roll-btn {
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+            background: #e67e22;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: 0.2s;
+        }
+
+        .roll-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        #result-text {
+            margin-top: 20px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            min-height: 1.6em;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scene">
+        <div class="cube" id="cube">
+            <div class="face face-red"><div class="circle"></div></div>
+            <div class="face face-orange"><div class="circle"></div></div>
+            <div class="face face-yellow"><div class="circle"></div></div>
+            <div class="face face-green"><div class="circle"></div></div>
+            <div class="face face-blue"><div class="circle"></div></div>
+            <div class="face face-pink"><div class="circle"></div></div>
+        </div>
+    </div>
+
+    <button class="roll-btn" id="roll-button">ROLL DICE</button>
+    <div id="result-text"></div>
+
+    <!--<audio id="roll-sound">
+        <source src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU9vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT18=" type="audio/wav">
+    </audio>-->
+	<audio id="roll-sound">
+        <source src="./dice-sfx.mp3" type="audio/mp3">
+    </audio>
+
+    <script>
+        const cube = document.getElementById('cube');
+        const rollBtn = document.getElementById('roll-button');
+        const resultText = document.getElementById('result-text');
+        const rollSound = document.getElementById('roll-sound');
+
+        const faces = [
+            { name: 'Red',    x: 0,   y: 0 },
+            { name: 'Orange', x: 0,   y: -90 },
+            { name: 'Yellow', x: 0,   y: -180 },
+            { name: 'Green',  x: 0,   y: 90 },
+            { name: 'Blue',   x: -90, y: 0 },
+            { name: 'Pink',   x: 90,  y: 0 }
+        ];
+
+        function rollDice() {
+            // Play sound
+            rollSound.currentTime = 0;
+            rollSound.play();
+
+            // Disable button during roll
+            rollBtn.disabled = true;
+            resultText.innerText = "Rolling...";
+
+            // Generate random face
+            const randomIndex = Math.floor(Math.random() * faces.length);
+            const targetFace = faces[randomIndex];
+
+            // Add multiple rotations for "tumbling" effect
+            const extraRounds = 5;
+            const xRotation = targetFace.x + (360 * extraRounds);
+            const yRotation = targetFace.y + (360 * extraRounds);
+
+            cube.style.transform = `translateZ(-75px) rotateX(${xRotation}deg) rotateY(${yRotation}deg)`;
+
+            // Wait for animation to finish (1.5s as defined in CSS)
+            setTimeout(() => {
+                resultText.innerText = targetFace.name;
+                resultText.style.color = `var(--color-${targetFace.name.toLowerCase()})`;
+                rollBtn.disabled = false;
+                
+                // Reset rotations to small numbers to prevent "infinite" degrees over many rolls
+                cube.style.transition = 'none';
+                cube.style.transform = `translateZ(-75px) rotateX(${targetFace.x}deg) rotateY(${targetFace.y}deg)`;
+                // Force a reflow
+                cube.offsetHeight;
+                cube.style.transition = 'transform 1.5s cubic-bezier(0.17, 0.67, 0.83, 0.67)';
+            }, 1500);
+        }
+
+        rollBtn.addEventListener('click', rollDice);
+    </script>
+</body>
+</html>
