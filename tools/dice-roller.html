@@ -129,11 +129,8 @@
     <button class="roll-btn" id="roll-button">ROLL DICE</button>
     <div id="result-text"></div>
 
-    <!--<audio id="roll-sound">
-        <source src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU9vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT18=" type="audio/wav">
-    </audio>-->
 	<audio id="roll-sound">
-        <source src="./dice-sfx.mp3" type="audio/mp3">
+        <source src="../assets/dice-sfx.mp3" type="audio/mp3">
     </audio>
 
     <script>
@@ -152,7 +149,6 @@
         ];
 
         function rollDice() {
-            // Play sound
             rollSound.currentTime = 0;
             rollSound.play();
 

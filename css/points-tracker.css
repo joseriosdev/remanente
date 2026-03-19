@@ -1,0 +1,95 @@
+:root {
+    --primary: #2c3e50;
+    --accent: #3498db;
+    --success: #27ae60;
+    --danger: #e74c3c;
+    --bg: #f8f9fa;
+    --text: #333;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background: var(--primary);
+    color: white;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.container {
+    max-width: 900px;
+    margin: 2rem auto;
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+h1, h2 { margin-top: 0; }
+
+/* Buttons */
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: opacity 0.2s;
+}
+.btn:hover { opacity: 0.8; }
+.btn-add { background: var(--success); color: white; }
+.btn-del { background: var(--danger); color: white; padding: 4px 8px; font-size: 0.8rem; }
+.btn-back { background: #95a5a6; color: white; margin-bottom: 1rem; }
+.btn-export { 
+    position: fixed; bottom: 20px; right: 20px; 
+    background: var(--primary); color: white; padding: 15px 25px; 
+    border-radius: 50px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    z-index: 100;
+}
+
+/* Forms */
+.input-group { margin-bottom: 1.5rem; display: flex; gap: 10px; }
+input[type="text"] {
+    flex-grow: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px;
+}
+
+/* Tables */
+table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+th { background: #f4f4f4; }
+
+.point-controls { display: flex; align-items: center; gap: 10px; }
+.point-btn {
+    width: 30px; height: 30px; border-radius: 50%; border: 1px solid #ddd;
+    background: white; cursor: pointer; font-weight: bold;
+}
+.point-btn:active { background: #eee; }
+
+/* Chart */
+.chart-container {
+    display: flex; flex-direction: column; align-items: center; margin-top: 3rem;
+    padding: 20px; border-top: 2px dashed #eee;
+}
+#pizza-chart { transform: rotate(-90deg); border-radius: 50%; }
+.legend { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 20px; justify-content: center; }
+.legend-item { display: flex; align-items: center; gap: 5px; font-size: 0.9rem; }
+.dot { width: 12px; height: 12px; border-radius: 2px; }
+
+/* Print Settings */
+@media print {
+    .btn, .input-group, .btn-export, .btn-del, .point-controls button { display: none !important; }
+    .container { box-shadow: none; border: none; width: 100%; max-width: 100%; }
+    body { background: white; }
+    #pizza-chart { page-break-inside: avoid; }
+}
+
+.hidden { display: none; }

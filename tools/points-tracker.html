@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Class - Point Tracker</title>
+    <link href="../css/points-tracker.css" rel="stylesheet">
+</head>
+<body>
+
+<header>
+    <div id="brand">Point Tracker Pro</div>
+    <div id="current-view-name">Groups</div>
+</header>
+
+<div class="container">
+    <div id="view-groups">
+        <h2>Class Groups</h2>
+        <div class="input-group">
+            <input type="text" id="new-group-name" placeholder="New Class Name (e.g. Group A)">
+            <button class="btn btn-add" onclick="addClass()">Add Class</button>
+        </div>
+        <table id="groups-table">
+            <thead>
+                <tr>
+                    <th>Group Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="groups-list"></tbody>
+        </table>
+    </div>
+
+    <div id="view-students" class="hidden">
+        <button class="btn btn-back" onclick="showGroups()">← Back to Groups</button>
+        <h2 id="active-class-title">Class Name</h2>
+        
+        <div class="input-group">
+            <input type="text" id="new-student-name" placeholder="Student Name + Last Name">
+            <button class="btn btn-add" onclick="addStudent()">Add Student</button>
+        </div>
+
+        <table id="students-table">
+            <thead>
+                <tr>
+                    <th>Student Name</th>
+                    <th>Points</th>
+                    <th>Adjust</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="students-list"></tbody>
+        </table>
+
+        <div class="chart-container" id="chart-section">
+            <h3>Class Distribution</h3>
+            <svg id="pizza-chart" width="300" height="300" viewBox="0 0 32 32"></svg>
+            <div id="chart-legend" class="legend"></div>
+        </div>
+    </div>
+</div>
+
+<button class="btn btn-export" onclick="window.print()">📄 Export PDF Report</button>
+<script src="../js/points-tracker.js"></script>
+</body>
+</html>

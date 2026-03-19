@@ -1,404 +1,235 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="icon" type="image/x-icon" href="https://cdn-icons-png.flaticon.com/512/1377/1377975.png">
-    <title>English Course - Interactive Learning</title>
+    <title>REMANEN&#10013;E | Haciendo Discípulos</title>
     <style>
         :root {
-            --bg-color: #f4f7f6;
-            --text-color: #333;
-            --card-bg: #ffffff;
-            --primary-color: #3498db;
-            --secondary-color: #2ecc71;
-            --highlight-color: #f1c40f;
-            --gray-out: #bdc3c7;
-            --accent-color: #e74c3c;
-            --danger-color: #e74c3c;
-            --border-radius: 12px;
-            --transition: all 0.3s ease;
-        }
-
-        [data-theme="dark"] {
-            --bg-color: #1a1a1a;
-            --text-color: #ecf0f1;
-            --card-bg: #2c3e50;
-            --primary-color: #2980b9;
-            --gray-out: #7f8c8d;
+            --primary: rgba(26, 58, 95, .8);
+            --secondary: #f39c12;
+            --accent: #27ae60;
+            --light: #f4f7f6;
+            --dark: #2c3e50;
+            --white: #ffffff;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
             margin: 0;
-            transition: var(--transition);
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: var(--white);
         }
 
-        header {
-            padding: 1rem 2rem;
+        /* Navigation */
+        nav {
+            background: var(--primary);
+            color: var(--white);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: var(--card-bg);
+            padding: 1rem 5%;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            gap: 10px;
-            flex-wrap: wrap;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px); 
+            box-shadow: 0 4px 30px rgba(14, 2, 43, 0.1);
+            border: 1px solid rgba(169, 168, 247, 0.3);
         }
 
-        .header-actions {
-            display: flex;
-            gap: 10px;
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .container {
-            max-width: 800px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-            flex-grow: 1;
-            width: 100%;
+        .nav-links { display: flex; list-style: none; gap: 20px; }
+
+        .nav-links li { position: relative; }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.3s;
         }
 
-        .hidden { display: none !important; }
+        .nav-links a:hover { color: var(--secondary); }
 
-        .btn {
-            padding: 10px 18px;
-            border: none;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            font-weight: 600;
-            transition: var(--transition);
+        /* Dropdown Logic */
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background: var(--white);
+            min-width: 200px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            border-radius: 4px;
+            top: 100%;
+            left: 0;
         }
 
-        .btn-primary { background: var(--primary-color); color: white; }
-        .btn-secondary { background: var(--secondary-color); color: white; }
-        .btn-outline { border: 2px solid var(--primary-color); background: transparent; color: var(--primary-color); }
-        .btn-danger { border: 2px solid var(--danger-color); background: transparent; color: var(--danger-color); font-size: 0.8rem; }
-        .btn-danger:hover { background: var(--danger-color); color: white; }
-        .btn:disabled { background: var(--gray-out); cursor: not-allowed; border-color: var(--gray-out); color: white; }
-
-        .card {
-            background: var(--card-bg);
-            padding: 1.5rem;
-            border-radius: var(--border-radius);
-            margin-bottom: 1rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            animation: fadeIn 0.4s ease;
+        .dropdown-content a {
+            color: var(--dark);
+            padding: 12px 16px;
+            display: block;
+            border-bottom: 1px solid #eee;
         }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .dropdown-content a:hover { background: #e9e9e9; color: var(--primary); }
 
-        .list-toggle {
-            margin-top: 10px;
-            padding: 10px;
-            background: rgba(0,0,0,0.05);
-            border-radius: 8px;
-            font-size: 0.9rem;
-        }
+        .dropdown:hover .dropdown-content { display: block; }
 
-        #sentences-view {
-            text-align: center;
-            min-height: 60vh;
+        /* Hero & About */
+        .hero {
+            background: linear-gradient(rgba(26, 58, 95, 0.8), rgba(26, 58, 95, 0.8)), url('./assets/main.jpeg') center/cover;
+            height: 60vh;
+            color: var(--white);
             display: flex;
             flex-direction: column;
             justify-content: center;
-            cursor: pointer;
-        }
-
-        .sentence-item {
-            font-size: 1.8rem;
-            margin: 1.5rem 0;
-            opacity: 0.3;
-            transition: var(--transition);
-        }
-
-        .sentence-item.highlight {
-            opacity: 1;
-            color: var(--primary-color);
-            transform: scale(1.05);
-            font-weight: bold;
-        }
-
-        .sentence-item.visited {
-            opacity: 0.5;
-            color: var(--gray-out);
-        }
-
-        .translation { display: block; font-size: 1rem; color: var(--secondary-color); margin-top: 5px; }
-        .pronunciation { display: block; font-size: 0.9rem; font-style: italic; color: var(--accent-color); }
-
-        #modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7);
-            display: flex;
             align-items: center;
-            justify-content: center;
-            z-index: 1000;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        .section { padding: 80px 10%; text-align: center; }
+
+        .bg-light { background: var(--light); }
+
+        .grid { 
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 30px;
+            margin-top: 40px; 
+        }
+
+        .card { 
+            background: var(--white);
+            padding: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+        }
+
+        .team-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 15px;
+            border: 4px solid firebrick;
+        }
+
+        footer { background: var(--primary); color: var(--white); padding: 40px 10%; text-align: center; }
+
+        .verse { font-style: italic; font-size: 1.2rem; margin-bottom: 20px; color: var(--secondary); }
+
+        @media (max-width: 768px) {
+            nav { flex-direction: column; gap: 15px; }
+            .nav-links { font-size: 0.9rem; }
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <button id="back-btn" class="btn btn-outline">← Back</button>
-        <h2 id="view-title" style="margin: 0; flex-grow: 1; text-align: center;">Modules</h2>
-        <div class="header-actions">
-            <button id="reset-btn" class="btn btn-danger" title="Restart all progress">Reset</button>
-            <button id="theme-toggle" class="btn btn-outline">🌓</button>
-        </div>
-    </header>
+    <nav>
+        <div class="logo">Remanen<span style="color:firebrick;font-weight: bold;">&#10013;</span>e</div>
+        <ul class="nav-links">
+            <li><a href="#about">Nosotros</a></li>
+            <li class="dropdown">
+                <a href="#">Herramientas ▾</a>
+                <div class="dropdown-content">
+                    <a href="./tools/eng-course.html">Curso de Inglés</a>
+                    <a href="./tools/dice-roller.html">Dado de Colores (Jenga)</a>
+                    <a href="./tools/points-tracker.html">Seguimiento de Puntos</a>
+                </div>
+            </li>
+            <li class="dropdown">
+                <a href="#">Discipulados ▾</a>
+                <div class="dropdown-content">
+                    <a href="#">Fundamentos de la Fe</a>
+                    <a href="#">Alianzas</a>
+                    <a href="#">Evangelismo</a>
+                    <a href="#">Escuela de Misiones</a>
+                </div>
+            </li>
+            <li><a href="#team">Equipo</a></li>
+            <li><a href="#contact">Ubicación</a></li>
+        </ul>
+    </nav>
 
-    <div class="container">
-        <div id="modules-view"></div>
-        <div id="lessons-view" class="hidden"></div>
-        <div id="sentences-view" class="hidden"></div>
-    </div>
+    <section class="hero">
+        <h1>Llevando a Cristo a Cada Rincón</h1>
+        <p>Haciendo discípulos y formando misioneros en comunidades de necesitadas.</p>
+    </section>
 
-    <div id="modal-overlay" class="hidden">
-        <div class="card" style="max-width: 400px; text-align: center;">
-            <h3>Ready?</h3>
-            <p>🖱️ <b>Click</b> or ⬇️ <b>Down Arrow</b>: Next Sentence</p>
-            <p>⬆️ <b>Up Arrow</b>: Previous Sentence</p>
-            <p>⌨️ <b>Enter/Space</b>: Hear Audio</p>
-            <button class="btn btn-primary" onclick="closeModal()">Start Lesson</button>
-        </div>
-    </div>
-
-    <script>
-        /**
-         * COURSE CONTENT
-         */
-        const COURSE_DATA = [
-            {
-                id: 1,
-                title: "Module 1: Greetings",
-                topics: ["Introduction", "Formal Greetings", "Informal Slang"],
-                lessons: [
-                    {
-                        id: 1,
-                        title: "Lesson 1: The Basics",
-                        resources: ["PDF: Useful Phrases", "Link: Audio Practice"],
-                        sentences: [
-                            { en: "Good morning, how can I help you?", es: "Buen día, ¿cómo puedo ayudarle?", ph: "gud mor-ning, hau kan ai help yoo?" },
-                            { en: "It is a pleasure to meet you.", es: "Es un placer conocerte.", ph: "it iz ei ple-shur too meet yoo." }
-                        ]
-                    }
-                ]
-            },
-            {
-                id: 2,
-                title: "Module 2: Daily Life",
-                topics: ["Work routine", "Shopping", "Food"],
-                lessons: [
-                    {
-                        id: 1,
-                        title: "Lesson 1: Food",
-                        resources: [],
-                        sentences: [
-                            { en: "I would like a coffee, please.", es: "Quisiera un café, por favor.", ph: "ai wud laik ei ko-fi pliz." }
-                        ]
-                    }
-                ]
-            }
-        ];
-
-        /**
-         * STATE & STORAGE
-         */
-        let currentView = 'modules';
-        let currentModuleIndex = null;
-        let currentLessonIndex = null;
-        let currentSentenceIndex = -1;
+    <section id="about" class="section">
+        <h2>Nuestra Misión</h2>
+        <p style="max-width: 800px; margin: 0 auto;">Somos una organización dedicada a proclamar el evangelio de Jesucristo a través del servicio práctico, la educación y el discipulado intencional. Creemos que cada niño y cada joven tiene un propósito divino.</p>
         
-        let progress = JSON.parse(localStorage.getItem('eng_course_progress')) || { maxModule: 0, maxLesson: 0 };
+        <div class="grid">
+            <div class="card">
+                <h3>Educación</h3>
+                <p>Brindamos herramientas como clases de inglés para abrir puertas de oportunidad a los niños de nuestra comunidad.</p>
+            </div>
+            <div class="card">
+                <h3>Discipulado</h3>
+                <p>No solo enseñamos; caminamos junto a cada persona para que crezcan en su relación con Dios.</p>
+            </div>
+            <div class="card">
+                <h3>Misiones</h3>
+                <p>Entrenamos a la próxima generación de misioneros listos para servir en cualquier lugar del mundo.</p>
+            </div>
+        </div>
+    </section>
 
-        const modulesView = document.getElementById('modules-view');
-        const lessonsView = document.getElementById('lessons-view');
-        const sentencesView = document.getElementById('sentences-view');
-        const viewTitle = document.getElementById('view-title');
-        const backBtn = document.getElementById('back-btn');
-        const resetBtn = document.getElementById('reset-btn');
+    <section id="team" class="section bg-light">
+        <h2>Nuestro Equipo</h2>
+        <div class="grid">
+            <div class="card">
+                <img src="./assets/sj.jpg" class="team-img" alt="Líder">
+                <h4>Directores Stiven & Jenny</h4>
+                <p>Dedicado a la visión estratégica y al desarrollo de nuevos líderes en el campo.</p>
+            </div>
+            <div class="card">
+                <img src="./assets/pao.jpeg" class="team-img" alt="Co-lider">
+                <h4>Co-Directora Pao</h4>
+                <p>Capacitadora y discipuladora de niños y adolecentes.</p>
+            </div>
+            <div class="card">
+                <img src="./assets/cata.jpeg" class="team-img" alt="Educación">
+                <h4>Fundadores Moi & Cata</h4>
+                <p>Fundadores del ministerio de misericordia, pero quién lo sostiene es el Espíritu.</p>
+            </div>
+            <div class="card">
+                <img src="./assets/joli.jpg" class="team-img" alt="Educación">
+                <h4>Siervos Jose & Lilo</h4>
+                <p>Liderando el programa de inglés y las herramientas pedagógicas para los niños.</p>
+            </div>
+        </div>
+    </section>
 
-        function init() {
-            renderModules();
-            setupTheme();
-        }
+    <section id="contact" class="section">
+        <h2>Ubicación</h2>
+        <p>Estamos trabajando activamente en las zonas de mayor necesidad en <strong>Barranquilla, Colombia</strong>.</p>
+        <div style="background: #eee; height: 300px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+            <p>
+                <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d411.62113421704345!2d-74.86456826477134!3d11.036957241643663!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sco!4v1773954250364!5m2!1sen!2sco" width="800" height="250" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+            </p>
+        </div>
+    </section>
 
-        // --- View Logic ---
-        function renderModules() {
-            currentView = 'modules';
-            //viewTitle.innerHTML = '<span style="font-family:Tahoma,sans-serif">REMANEN<span style="color:red;font-size:20pt">T</span>E</span><br>Curso de Inglés';
-			viewTitle.innerHTML = 'Curso de Inglés<br><img src="./remanente.png" alt="remanente" width="130px" height="30px">';
-            backBtn.classList.add('hidden');
-            modulesView.innerHTML = '';
-            lessonsView.classList.add('hidden');
-            sentencesView.classList.add('hidden');
-            modulesView.classList.remove('hidden');
+    <footer>
+        <div class="verse">
+            "Por tanto, id, y haced discípulos a todas las naciones... y he aquí yo estoy con vosotros todos los días, hasta el fin del mundo." <br>
+            <strong>Mateo 28:19-20</strong>
+        </div>
+        <p>&copy; 2026 REMANEN&#10013;E. Todos los derechos reservados.</p>
+    </footer>
 
-            COURSE_DATA.forEach((mod, index) => {
-                const isLocked = index > progress.maxModule;
-                const div = document.createElement('div');
-                div.className = 'card';
-                div.innerHTML = `
-                    <h3>${mod.title} ${isLocked ? '🔒' : ''}</h3>
-                    <div style="display:flex; gap:10px;">
-                        <button class="btn btn-outline" onclick="toggleList('mod-topics-${index}')">Topics</button>
-                        <button class="btn btn-primary" ${isLocked ? 'disabled' : ''} onclick="goToLessons(${index})">Enter Module</button>
-                    </div>
-                    <div id="mod-topics-${index}" class="list-toggle hidden">
-                        <ul>${mod.topics.map(t => `<li>${t}</li>`).join('')}</ul>
-                    </div>
-                `;
-                modulesView.appendChild(div);
-            });
-        }
-
-        function goToLessons(modIndex) {
-            currentView = 'lessons';
-            currentModuleIndex = modIndex;
-            viewTitle.innerText = COURSE_DATA[modIndex].title;
-            backBtn.classList.remove('hidden');
-            modulesView.classList.add('hidden');
-            lessonsView.classList.remove('hidden');
-            lessonsView.innerHTML = '';
-
-            COURSE_DATA[modIndex].lessons.forEach((less, lIndex) => {
-                const isLocked = (modIndex === progress.maxModule && lIndex > progress.maxLesson) || (modIndex > progress.maxModule);
-                const div = document.createElement('div');
-                div.className = 'card';
-                div.innerHTML = `
-                    <h4>${less.title} ${isLocked ? '🔒' : ''}</h4>
-                    <div style="display:flex; gap:10px;">
-                        <button class="btn btn-outline" onclick="toggleList('less-res-${lIndex}')">Resources</button>
-                        <button class="btn btn-secondary" ${isLocked ? 'disabled' : ''} onclick="startSentences(${lIndex})">Practice</button>
-                    </div>
-                    <div id="less-res-${lIndex}" class="list-toggle hidden">
-                        <ul>${less.resources.map(r => `<li>${r}</li>`).join('') || 'No extra resources'}</ul>
-                    </div>
-                `;
-                lessonsView.appendChild(div);
-            });
-        }
-
-        function startSentences(lessIndex) {
-            currentView = 'sentences';
-            currentLessonIndex = lessIndex;
-            currentSentenceIndex = -1;
-            lessonsView.classList.add('hidden');
-            sentencesView.classList.remove('hidden');
-            viewTitle.innerText = COURSE_DATA[currentModuleIndex].lessons[lessIndex].title;
-            sentencesView.innerHTML = '';
-            document.getElementById('modal-overlay').classList.remove('hidden');
-        }
-
-        function updateSentences() {
-            const sentences = COURSE_DATA[currentModuleIndex].lessons[currentLessonIndex].sentences;
-            sentencesView.innerHTML = '';
-            sentences.forEach((s, i) => {
-                if (i <= currentSentenceIndex) {
-                    const div = document.createElement('div');
-                    div.className = `sentence-item ${i === currentSentenceIndex ? 'highlight' : 'visited'}`;
-                    div.innerHTML = `
-                        ${s.en}
-                        <span class="translation">${s.es}</span>
-                        <span class="pronunciation">[ ${s.ph} ]</span>
-                    `;
-                    sentencesView.appendChild(div);
-                }
-            });
-            if (currentSentenceIndex === sentences.length - 1) unlockNext();
-        }
-
-        function unlockNext() {
-            const currentMod = COURSE_DATA[currentModuleIndex];
-            if (currentLessonIndex === progress.maxLesson && currentModuleIndex === progress.maxModule) {
-                if (currentLessonIndex < currentMod.lessons.length - 1) {
-                    progress.maxLesson++;
-                } else if (currentModuleIndex < COURSE_DATA.length - 1) {
-                    progress.maxModule++;
-                    progress.maxLesson = 0;
-                }
-                localStorage.setItem('eng_course_progress', JSON.stringify(progress));
-            }
-        }
-
-        function resetProgress() {
-            if (confirm("¿Estás seguro/a de querer reiniciar TODO el progreso? Esta acción no se puede reversar.")) {
-                localStorage.removeItem('eng_course_progress');
-                progress = { maxModule: 0, maxLesson: 0 };
-                renderModules();
-            }
-        }
-
-        // --- Audio & Navigation ---
-        function nextSentence() {
-            const sentences = COURSE_DATA[currentModuleIndex].lessons[currentLessonIndex].sentences;
-            if (currentSentenceIndex < sentences.length - 1) {
-                currentSentenceIndex++;
-                updateSentences();
-            }
-        }
-
-        function prevSentence() {
-            if (currentSentenceIndex > 0) {
-                currentSentenceIndex--;
-                updateSentences();
-            }
-        }
-
-        function playPronunciation() {
-            if (currentSentenceIndex === -1) return;
-            const text = COURSE_DATA[currentModuleIndex].lessons[currentLessonIndex].sentences[currentSentenceIndex].en;
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'en-US';
-            utterance.rate = 0.85;
-            window.speechSynthesis.cancel(); // Stop current speech
-            window.speechSynthesis.speak(utterance);
-        }
-
-        function toggleList(id) { document.getElementById(id).classList.toggle('hidden'); }
-        function closeModal() { document.getElementById('modal-overlay').classList.add('hidden'); }
-
-        backBtn.onclick = () => {
-            if (currentView === 'lessons') renderModules();
-            else if (currentView === 'sentences') goToLessons(currentModuleIndex);
-        };
-
-        resetBtn.onclick = (e) => {
-            e.stopPropagation();
-            resetProgress();
-        };
-
-        function setupTheme() {
-            const themeToggle = document.getElementById('theme-toggle');
-            themeToggle.onclick = () => {
-                const current = document.body.getAttribute('data-theme');
-                document.body.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
-            };
-        }
-
-        window.onclick = (e) => {
-            if (currentView === 'sentences' && !document.getElementById('modal-overlay').contains(e.target) && !e.target.closest('header')) {
-                nextSentence();
-            }
-        };
-
-        window.onkeydown = (e) => {
-            if (currentView !== 'sentences') return;
-            if (e.key === 'ArrowDown') nextSentence();
-            if (e.key === 'ArrowUp') prevSentence();
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                playPronunciation();
-            }
-        };
-
-        init();
-    </script>
 </body>
 </html>
