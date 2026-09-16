@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>English Evaluation Portal - Interactive Exam</title>
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --kids-bg: #fdfbf7;
+      --kids-card: #ffffff;
+      --kids-accent: #ff9f43;
+      --teen-bg: #f8fafc;
+      --teen-card: #ffffff;
+      --teen-accent: #1e3a8a;
+      --success: #10b981;
+      --danger: #ef4444;
+      --text: #1e293b;
+      --muted: #64748b;
+      --border: #cbd5e1;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #f1f5f9;
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 10px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 850px;
+      background-color: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      padding: 24px 32px;
+      margin-top: 10px;
+    }
+
+    /* Views visibility */
+    .view {
+      display: none;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    /* Registration Screen */
+    .welcome-card {
+      text-align: center;
+      padding: 20px 10px;
+    }
+
+    .welcome-card h1 {
+      color: var(--primary);
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+
+    .welcome-card p {
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    .exam-selector {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .selector-btn {
+      flex: 1;
+      min-width: 220px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      background-color: #ffffff;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+
+    .selector-btn:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .selector-btn.selected {
+      border-color: var(--primary);
+      background-color: #eeeffe;
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+    }
+
+    .selector-btn .icon {
+      font-size: 2.5rem;
+      margin-bottom: 8px;
+    }
+
+    .selector-btn h3 {
+      font-size: 1.2rem;
+      color: var(--text);
+    }
+
+    .selector-btn p {
+      font-size: 0.85rem;
+      margin-bottom: 0;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .btn-main {
+      width: 100%;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 20px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+      margin-top: 10px;
+    }
+
+    .btn-main:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .btn-main:active {
+      transform: scale(0.99);
+    }
+
+    /* Exam Header */
+    .exam-header {
+      background-color: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .user-badge {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .user-avatar {
+      width: 44px;
+      height: 44px;
+      background-color: var(--primary);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+
+    /* Section Cards */
+    .section-box {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
+    .section-title {
+      font-size: 1.15rem;
+      font-weight: bold;
+      color: var(--primary);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 8px;
+    }
+
+    .instruction {
+      font-size: 0.95rem;
+      color: var(--muted);
+      margin-bottom: 16px;
+      font-style: italic;
+    }
+
+    /* Question Styles */
+    .q-item {
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px dashed #e2e8f0;
+    }
+
+    .q-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .q-text {
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .option-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .option-label:hover {
+      background-color: #f8fafc;
+    }
+
+    .option-label input[type="radio"] {
+      accent-color: var(--primary);
+      width: 18px;
+      height: 18px;
+    }
+
+    select.input-select {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1.5px solid var(--border);
+      font-size: 0.95rem;
+      background-color: #fff;
+    }
+
+    /* Reading Box */
+    .reading-card {
+      background-color: #f0f9ff;
+      border-left: 4px solid #0284c7;
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 16px;
+      font-size: 0.98rem;
+      line-height: 1.6;
+    }
+
+    /* Summary View */
+    .summary-card {
+      text-align: center;
+    }
+
+    .score-circle {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      background: conic-gradient(var(--primary) 0%, #e2e8f0 0%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 20px auto;
+      position: relative;
+    }
+
+    .score-inner {
+      width: 105px;
+      height: 105px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+
+    .score-inner .score-num {
+      font-size: 1.8rem;
+      color: var(--primary);
+    }
+
+    .score-inner .score-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .info-summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      text-align: left;
+    }
+
+    .info-summary-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .info-summary-table td:first-child {
+      font-weight: bold;
+      color: var(--muted);
+      width: 40%;
+    }
+
+    .json-box {
+      background-color: #0f172a;
+      color: #38bdf8;
+      padding: 14px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 0.85rem;
+      text-align: left;
+      max-height: 200px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+      margin: 16px 0;
+    }
+
+    .btn-secondary {
+      background-color: #64748b;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      font-size: 0.95rem;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 4px;
+    }
+
+    .btn-secondary:hover {
+      background-color: #475569;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- VIEW 1: REGISTRATION & EXAM SELECTOR -->
+    <div id="view-register" class="view active">
+      <div class="welcome-card">
+        <h1>🌟 English Evaluation Portal</h1>
+        <p>Por favor selecciona el tipo de examen e ingresa los datos de la estudiante.</p>
+
+        <div class="exam-selector">
+          <div class="selector-btn selected" onclick="selectExamType('kids')" id="btn-type-kids">
+            <div class="icon">🎈</div>
+            <h3>Kids Exam</h3>
+            <p>Niñas de 7 Años (Nivel Principiante)</p>
+          </div>
+          <div class="selector-btn" onclick="selectExamType('teenagers')" id="btn-type-teenagers">
+            <div class="icon">🎓</div>
+            <h3>Teenagers Exam</h3>
+            <p>Niñas de 11 a 16 Años (Saber Pro Style)</p>
+          </div>
+        </div>
+
+        <form id="form-register" onsubmit="startExam(event)">
+          <div class="form-group">
+            <label for="student-name">Nombre Completo del Estudiante:</label>
+            <input type="text" id="student-name" placeholder="Ej. Maria Camila Gomez" required>
+          </div>
+
+          <div class="form-group">
+            <label for="student-age">Edad (Años):</label>
+            <input type="number" id="student-age" min="5" max="18" placeholder="Ej. 7 o 14" required>
+          </div>
+
+          <button type="submit" class="btn-main">Comenzar Examen 🚀</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- VIEW 2: KIDS EXAM -->
+    <div id="view-exam-kids" class="view">
+      <div class="exam-header">
+        <div class="user-badge">
+          <div class="user-avatar" id="avatar-kids">K</div>
+          <div>
+            <h3 id="hdr-name-kids">Student Name</h3>
+            <span style="font-size: 0.85rem; color: var(--muted);" id="hdr-info-kids">7 Años • Kids Exam</span>
+          </div>
+        </div>
+        <div>
+          <span style="background-color: #fef3c7; color: #92400e; padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 0.85rem;">
+            Examen Principiante 🎈
+          </span>
+        </div>
+      </div>
+
+      <form id="form-exam-kids" onsubmit="evaluateKidsExam(event)">
+        
+        <!-- Section 1: Numbers -->
+        <div class="section-box">
+          <div class="section-title">🔢 1. Numbers (0 to 20)</div>
+          <div class="instruction">A. Selecciona el número correspondiente en inglés para cada cifra:</div>
+          
+          <div class="q-item">
+            <div class="q-text">1. Número 5:</div>
+            <select class="input-select" name="k_q1" required>
+              <option value="">-- Selecciona --</option>
+              <option value="fifteen">Fifteen</option>
+              <option value="five">Five</option>
+              <option value="fifty">Fifty</option>
+            </select>
+          </div>
+
+          <div class="q-item">
+            <div class="q-text">2. Número 12:</div>
+            <select class="input-select" name="k_q2" required>
+              <option value="">-- Selecciona --</option>
+              <option value="twelve">Twelve</option>
+              <option value="twenty">Twenty</option>
+              <option value="two">Two</option>
+            </select>
+          </div>
+
+          <div class="q-item">
+            <div class="q-text">3. Cuenta las manzanas: 🍎 🍎 🍎 🍎 🍎 🍎 🍎 (7)</div>
+            <select class="input-select" name="k_q3" required>
+              <option value="">-- Selecciona --</option>
+              <option value="six">Six</option>
+              <option value="seven">Seven</option>
+              <option value="seventeen">Seventeen</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Section 2: Body Parts -->
+        <div class="section-box">
+          <div class="section-title">👤 2. Body Parts</div>
+          <div class="instruction">Indica si las siguientes afirmaciones son Verdaderas (True) o Falsas (False):</div>
+
+          <div class="q-item">
+            <div class="q-text">4. I have two eyes.</div>
+            <div class="options-grid">
+              <label class="option-label"><input type="radio" name="k_q4" value="True" required> True (Verdadero)</label>
+              <label class="option-label"><input type="radio" name="k_q4" value="False"> False (Falso)</label>
+            </div>
+          </div>
+
+          <div class="q-item">
+            <div class="q-text">5. I have five noses.</div>
+            <div class="options-grid">
+              <label class="option-label"><input type="radio" name="k_q5" value="True" required> True (Verdadero)</label>
+              <label class="option-label"><input type="radio" name="k_q5" value="False"> False (Falso)</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 3: Clothes & Class Elements -->
+        <div class="section-box">
+          <div class="section-title">👗✏️ 3. Clothes & Class Elements</div>
+          <div class="instruction">Selecciona la categoría correcta para cada elemento:</div>
+
+          <div class="q-item">
+            <div class="q-text">6. Pencil (Lápiz)</div>
+            <select class="input-select" name="k_q6" required>
+              <option value="">-- Categoría --</option>
+              <option value="Class Element">Classroom Element</option>
+              <option value="Clothes">Clothes</option>
+            </select>
+          </div>
+
+          <div class="q-item">
+            <div class="q-text">7. Dress (Vestido)</div>
+            <select class="input-select" name="k_q7" required>
+              <option value="">-- Categoría --</option>
+              <option value="Class Element">Classroom Element</option>
+              <option value="Clothes">Clothes</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Section 4: Pronouns & Verb To Be -->
+        <div class="section-box">
+          <div class="section-title">💬 4. Pronouns & Verbs (To Be)</div>
+
+          <div class="q-item">
+            <div class="q-text">8. Complete: "I ____ a happy girl."</div>
+            <div class="options-grid">
+              <label class="option-label"><input type="radio" name="k_q8" value="am" required> am</label>
+              <label class="option-label"><input type="radio" name="k_q8" value="is"> is</label>
+              <label class="option-label"><input type="radio" name="k_q8" value="are"> are</label>
+            </div>
+          </div>
+
+          <div class="q-item">
+            <div class="q-text">9. Para referirte a una niña o mujer usas el pronombre:</div>
+            <div class="options-grid">
+              <label class="option-label"><input type="radio" name="k_q9" value="He" required> He</label>
+              <label class="option-label"><input type="radio" name="k_q9" value="She"> She</label>
+              <label class="option-label"><input type="radio" name="k_q9" value="It"> It</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 5: Reading Comprehension -->
+        <div class="section-box">
+          <div class="section-title">📖 5. Reading Comprehension</div>
+          <div class="reading-card">
+            <strong>Hello! My name is Emma.</strong> I am 7 years old. Today I am going to school! 
+            I am wearing a bright <strong>blue dress</strong> and <strong>white shoes</strong>. 
+            In my backpack, I have <strong>three pencils</strong> and a <strong>green eraser</strong>.
+          </div>
+
+          <div class="q-item">
+            <div class="q-text">10. Emma is wearing a yellow dress.</div>
+            <div class="options-grid">
+              <label class="option-label"><input type="radio" name="k_q10" value="True" required> True (Verdadero)</label>
+              <label class="option-label"><input type="radio" name="k_q10" value="False"> False (Falso)</label>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-main">Entregar Examen 🎯</button>
+      </form>
+    </div>
+
+    <!-- VIEW 3: TEENAGERS EXAM (SABER PRO STYLE) -->
+    <div id="view-exam-teenagers" class="view">
+      <div class="exam-header">
+        <div class="user-badge">
+          <div class="user-avatar" id="avatar-teen" style="background-color: var(--teen-accent);">T</div>
+          <div>
+            <h3 id="hdr-name-teen">Student Name</h3>
+            <span style="font-size: 0.85rem; color: var(--muted);" id="hdr-info-teen">14 Años • Teenagers Exam</span>
+          </div>
+        </div>
+        <div>
+          <span style="background-color: #1e3a8a; color: white; padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 0.8rem;">
+            PRUEBA SABER PRO / ICFES
+          </span>
+        </div>
+      </div>
+
+      <form id="form-exam-teenagers" onsubmit="evaluateTeenExam(event)">
+        
+        <!-- Part 1: Vocabulary & Matching -->
+        <div class="section-box">
+          <div class="section-title">PART 1: VOCABULARIO Y DEFINICIONES</div>
+          <div class="instruction">Relaciona la descripción con la palabra correcta:</div>
+
+          <div class="q-item">
+            <div class="q-text">1. A comfortable piece of clothing worn over a shirt to keep warm at school:</div>
+            <select class="input-select" name="t_q1" required>
+              <option value="">-- Select word --</option>
+              <option value="Calculator">Calculator</option>
+              <option value="Sweater">Sweater</option>
+              <option value="Backpack">Backpack</option>
+              <option value="Trousers">Trousers</option>
+            </select>
+          </div>
+
+          <div class="q-item">
+            <div class="q-text">2. An electronic object used in math class to calculate numbers:</div>
+            <select class="input-select" name="t_q2" required>
+              <option value="">-- Select word --</option>
+              <option value="Calculator">Calculator</option>
+              <option value="Ruler">Ruler</option>
+              <option value="Pencil case">Pencil case</option>
+            </select>
+          </div>
+
+          <div class="q-item">
+            <div class="q-text">3. The part of the body attached to your hand, containing five fingers:</div>
+            <select class="input-select" name="t_q3" required>
+              <option value="">-- Select word --</option>
+              <option value="Arm">Arm</option>
+              <option value="Leg">Leg</option>
+              <option value="Foot">Foot</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Part 2: Grammar & Dialogues -->
+        <div class="section-box">
+          <div class="section-title">PART 2: GRAMÁTICA Y DIÁLOGOS CORTOS</div>
+
+          <div class="q-item">
+            <div class="q-text">4. Teacher: "Where ____ Sarah and her classmates right now?" - Student: "They are in the library."</div>
+            <div class="options-grid">
+              <label class="option-label"><input type="radio" name="t_q4" value="am" required> A) am</label>
+              <label class="option-label"><input type="radio" name="t_q4" value="is"> B) is</label>
+              <label class="option-label"><input type="radio" name="t_q4" value="are"> C) are</label>
+            </div>
+          </div>
+
+          <div class="q-item">
+            <div class="q-text">5. "Does Sophia wear ____ blue uniform every Friday?"</div>
+            <div class="options-grid">
+              <label class="option-label"><input type="radio" name="t_q5" value="she" required> A) she</label>
+              <label class="option-label"><input type="radio" name="t_q5" value="her"> B) her</label>
+              <label class="option-label"><input type="radio" name="t_q5" value="hers"> C) hers</label>
+            </div>
+          </div>
+
+          <div class="q-item">
+            <div class="q-text">6. "How many notebooks do you have?" - "I have exactly ____ notebooks." (15)</div>
+            <div class="options-grid">
+              <label class="option-label"><input type="radio" name="t_q6" value="fifty" required> A) fifty</label>
+              <label class="option-label"><input type="radio" name="t_q6" value="fifteen"> B) fifteen</label>
+              <label class="option-label"><input type="radio" name="t_q6" value="fifth"> C) fifth</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Part 3: Reading Comprehension -->
+        <div class="section-box">
+          <div class="section-title">PART 3: COMPRENSIÓN LECTORA (SABER PRO)</div>
+          <div class="reading-card">
+            <strong>Maya’s Routine: Science, Style, and Health</strong><br>
+            Maya is a 14-year-old high school student from Medellin. Every morning she wears her official school uniform: a dark blue skirt, a white shirt, black shoes, and a green jacket when cold. In her backpack, she carries <strong>twelve color pencils</strong>, two pens, and a scientific calculator. To stay healthy, she plays basketball and always stretches her <strong>legs and arms</strong> before running.
+          </div>
+
+          <div class="q-item">
+            <div class="q-text">7. How many color pencils does Maya carry in her bag?</div>
+            <div class="options-grid">
+              <label class="option-label"><input type="radio" name="t_q7" value="2" required> A) 2</label>
+              <label class="option-label"><input type="radio" name="t_q7" value="10"> B) 10</label>
+              <label class="option-label"><input type="radio" name="t_q7" value="12"> C) 12 (twelve)</label>
+              <label class="option-label"><input type="radio" name="t_q7" value="20"> D) 20 (twenty)</label>
+            </div>
+          </div>
+
+          <div class="q-item">
+            <div class="q-text">8. What body parts does Maya stretch before playing basketball?</div>
+            <div class="options-grid">
+              <label class="option-label"><input type="radio" name="t_q8" value="hands" required> A) Her hands and head</label>
+              <label class="option-label"><input type="radio" name="t_q8" value="legs_arms"> B) Her legs and arms</label>
+              <label class="option-label"><input type="radio" name="t_q8" value="feet"> C) Her feet and ears</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Part 4: True / False Analysis -->
+        <div class="section-box">
+          <div class="section-title">PART 4: ANÁLISIS GRAMATICAL Y NÚMEROS</div>
+
+          <div class="q-item">
+            <div class="q-text">9. The sentence "She are writing with a blue pen" is grammatically correct.</div>
+            <div class="options-grid">
+              <label class="option-label"><input type="radio" name="t_q9" value="True" required> True (Verdadero)</label>
+              <label class="option-label"><input type="radio" name="t_q9" value="False"> False (Falso)</label>
+            </div>
+          </div>
+
+          <div class="q-item">
+            <div class="q-text">10. The mathematical operation "seven (7) + eleven (11)" equals "eighteen (18)".</div>
+            <div class="options-grid">
+              <label class="option-label"><input type="radio" name="t_q10" value="True" required> True (Verdadero)</label>
+              <label class="option-label"><input type="radio" name="t_q10" value="False"> False (Falso)</label>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-main">Enviar Evaluación 🏆</button>
+      </form>
+    </div>
+
+    <!-- VIEW 4: SUMMARY & RESULTS -->
+    <div id="view-summary" class="view">
+      <div class="summary-card">
+        <h2>📊 Resumen de la Evaluación</h2>
+        <p style="color: var(--muted);">Los datos y resultados han sido guardados exitosamente en `localStorage` (JSON).</p>
+
+        <div class="score-circle" id="score-circle-bg">
+          <div class="score-inner">
+            <div class="score-num" id="res-score-pct">0%</div>
+            <div class="score-label" id="res-score-ratio">0 / 0</div>
+          </div>
+        </div>
+
+        <h3 id="res-feedback-text">¡Buen trabajo!</h3>
+
+        <table class="info-summary-table">
+          <tr>
+            <td>Estudiante:</td>
+            <td id="res-name">-</td>
+          </tr>
+          <tr>
+            <td>Edad:</td>
+            <td id="res-age">-</td>
+          </tr>
+          <tr>
+            <td>Tipo de Examen:</td>
+            <td id="res-type">-</td>
+          </tr>
+          <tr>
+            <td>Puntaje Final:</td>
+            <td id="res-score-detail">-</td>
+          </tr>
+          <tr>
+            <td>Fecha de Registro:</td>
+            <td id="res-date">-</td>
+          </tr>
+        </table>
+
+        <div>
+          <button class="btn-secondary" onclick="toggleJSONDisplay()">👁️ Ver JSON en LocalStorage</button>
+          <button class="btn-secondary" onclick="copyJSONData()">📋 Copiar JSON</button>
+          <button class="btn-secondary" onclick="restartApp()">🔄 Realizar otro examen</button>
+        </div>
+
+        <div id="json-preview" class="json-box" style="display: none;"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // State object
+    let currentExamType = 'kids';
+    let currentUserData = {};
+
+    // DOM Elements
+    const viewRegister = document.getElementById('view-register');
+    const viewExamKids = document.getElementById('view-exam-kids');
+    const viewExamTeen = document.getElementById('view-exam-teenagers');
+    const viewSummary = document.getElementById('view-summary');
+
+    function selectExamType(type) {
+      currentExamType = type;
+      document.getElementById('btn-type-kids').classList.toggle('selected', type === 'kids');
+      document.getElementById('btn-type-teenagers').classList.toggle('selected', type === 'teenagers');
+    }
+
+    function showView(viewElement) {
+      [viewRegister, viewExamKids, viewExamTeen, viewSummary].forEach(v => v.classList.remove('active'));
+      viewElement.classList.add('active');
+    }
+
+    function startExam(event) {
+      event.preventDefault();
+      const name = document.getElementById('student-name').value.trim();
+      const age = parseInt(document.getElementById('student-age').value);
+
+      if (!name || isNaN(age)) {
+        alert("Por favor completa el nombre y la edad.");
+        return;
+      }
+
+      currentUserData = {
+        name: name,
+        age: age,
+        examType: currentExamType,
+        startTime: new Date().toISOString()
+      };
+
+      if (currentExamType === 'kids') {
+        document.getElementById('hdr-name-kids').textContent = name;
+        document.getElementById('hdr-info-kids').textContent = `${age} Años • Kids Exam`;
+        document.getElementById('avatar-kids').textContent = name.charAt(0).toUpperCase();
+        showView(viewExamKids);
+      } else {
+        document.getElementById('hdr-name-teen').textContent = name;
+        document.getElementById('hdr-info-teen').textContent = `${age} Años • Teenagers Exam (Saber Pro)`;
+        document.getElementById('avatar-teen').textContent = name.charAt(0).toUpperCase();
+        showView(viewExamTeen);
+      }
+    }
+
+    // Evaluate Kids Exam
+    function evaluateKidsExam(event) {
+      event.preventDefault();
+      const form = document.getElementById('form-exam-kids');
+      const formData = new FormData(form);
+
+      const correctAnswers = {
+        k_q1: "five",
+        k_q2: "twelve",
+        k_q3: "seven",
+        k_q4: "True",
+        k_q5: "False",
+        k_q6: "Class Element",
+        k_q7: "Clothes",
+        k_q8: "am",
+        k_q9: "She",
+        k_q10: "False"
+      };
+
+      let score = 0;
+      let total = Object.keys(correctAnswers).length;
+      let userAnswers = {};
+
+      for (let key in correctAnswers) {
+        let val = formData.get(key);
+        userAnswers[key] = val;
+        if (val === correctAnswers[key]) {
+          score++;
+        }
+      }
+
+      finishExam(score, total, userAnswers);
+    }
+
+    // Evaluate Teenager Exam
+    function evaluateTeenExam(event) {
+      event.preventDefault();
+      const form = document.getElementById('form-exam-teenagers');
+      const formData = new FormData(form);
+
+      const correctAnswers = {
+        t_q1: "Sweater",
+        t_q2: "Calculator",
+        t_q3: "Arm",
+        t_q4: "are",
+        t_q5: "her",
+        t_q6: "fifteen",
+        t_q7: "12",
+        t_q8: "legs_arms",
+        t_q9: "False",
+        t_q10: "True"
+      };
+
+      let score = 0;
+      let total = Object.keys(correctAnswers).length;
+      let userAnswers = {};
+
+      for (let key in correctAnswers) {
+        let val = formData.get(key);
+        userAnswers[key] = val;
+        if (val === correctAnswers[key]) {
+          score++;
+        }
+      }
+
+      finishExam(score, total, userAnswers);
+    }
+
+    // Save and Display Summary
+    function finishExam(score, total, userAnswers) {
+      const percentage = Math.round((score / total) * 100);
+      
+      const finalResult = {
+        studentInfo: {
+          name: currentUserData.name,
+          age: currentUserData.age,
+          examType: currentUserData.examType === 'kids' ? 'Kids (7 years)' : 'Teenagers (11-16 years)'
+        },
+        evaluation: {
+          score: score,
+          totalQuestions: total,
+          percentage: `${percentage}%`,
+          answers: userAnswers,
+          completedAt: new Date().toLocaleString('es-CO')
+        }
+      };
+
+      // Save to localStorage as JSON
+      localStorage.setItem('english_exam_result', JSON.stringify(finalResult));
+
+      // Render Summary View
+      document.getElementById('res-name').textContent = finalResult.studentInfo.name;
+      document.getElementById('res-age').textContent = `${finalResult.studentInfo.age} Años`;
+      document.getElementById('res-type').textContent = finalResult.studentInfo.examType;
+      document.getElementById('res-score-detail').textContent = `${score} / ${total} (${percentage}%)`;
+      document.getElementById('res-date').textContent = finalResult.evaluation.completedAt;
+
+      document.getElementById('res-score-pct').textContent = `${percentage}%`;
+      document.getElementById('res-score-ratio').textContent = `${score} / ${total}`;
+
+      // Progress Ring CSS
+      const scoreCircleBg = document.getElementById('score-circle-bg');
+      scoreCircleBg.style.background = `conic-gradient(var(--primary) ${percentage}%, #e2e8f0 ${percentage}%)`;
+
+      // Feedback message
+      const feedback = document.getElementById('res-feedback-text');
+      if (percentage >= 80) {
+        feedback.textContent = "🌟 ¡Excelente Desempeño! / Excellent Job!";
+        feedback.style.color = "var(--success)";
+      } else if (percentage >= 60) {
+        feedback.textContent = "👍 ¡Buen Trabajo! / Good Job!";
+        feedback.style.color = "var(--primary)";
+      } else {
+        feedback.textContent = "📚 Sigue Practicando / Keep Practicing!";
+        feedback.style.color = "var(--kids-accent)";
+      }
+
+      // Populate JSON display
+      document.getElementById('json-preview').textContent = JSON.stringify(finalResult, null, 2);
+
+      showView(viewSummary);
+    }
+
+    function toggleJSONDisplay() {
+      const box = document.getElementById('json-preview');
+      box.style.display = box.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function copyJSONData() {
+      const jsonText = document.getElementById('json-preview').textContent;
+      navigator.clipboard.writeText(jsonText).then(() => {
+        alert("¡JSON copiado al portapapeles!");
+      }).catch(err => {
+        alert("Error al copiar: " + err);
+      });
+    }
+
+    function restartApp() {
+      document.getElementById('form-register').reset();
+      document.getElementById('form-exam-kids').reset();
+      document.getElementById('form-exam-teenagers').reset();
+      showView(viewRegister);
+    }
+  </script>
+</body>
+</html>
